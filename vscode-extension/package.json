@@ -1,0 +1,13 @@
+{
+  "name": "skillforge",
+  "displayName": "SkillForge",
+  "version": "0.1.0",
+  "engines": { "vscode": "^1.80.0" },
+  "main": "extension.js",
+"contributes": {
+    "commands": [
+      { "command": "skillforge.audit", "title": "SkillForge: Audit" },
+      { "command": "skillforge.duplicates", "title": "SkillForge: Duplicates" }
+    ]
+  }
+}

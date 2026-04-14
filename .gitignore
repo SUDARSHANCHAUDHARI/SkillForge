@@ -1,0 +1,29 @@
+# User/plugin config
+.claude-plugin-config.json
+.claude/settings.local.json
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor
+.idea/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+
+# Env / secrets
+.env
+.env.local
+secrets.*
+credentials.*
+
+# Node/Web
+node_modules/
+dist/
