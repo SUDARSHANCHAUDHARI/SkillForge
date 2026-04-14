@@ -6,7 +6,7 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey)
 
-SkillForge scans directories of `.md` skill/prompt files, detects duplicates using cosine similarity, flags quality issues, and gives you real-time watching — all from a single CLI. Comes with a VS Code extension and a Chrome extension.
+SkillForge scans directories of `.md` skill/prompt files, detects duplicates using cosine similarity, flags quality issues, scores files 0–100, and gives you real-time watching — all from a single CLI. Comes with a VS Code extension and a Chrome extension.
 
 ---
 
@@ -14,10 +14,15 @@ SkillForge scans directories of `.md` skill/prompt files, detects duplicates usi
 
 - **Duplicate detection** — TF-IDF cosine similarity across all skill files
 - **Quality analysis** — flags vague, too-short, or poorly structured prompts
-- **Live watching** — auto-audit on file change using watchdog
-- **Rich output** — clean tables and colored output via Rich
-- **VS Code extension** — audit and duplicates commands in the editor
-- **Chrome extension** — save prompts as `.md` files and analyze them inline
+- **Scoring** — 0–100 quality score per file
+- **Lint** — bulk quality check across all files in a table
+- **Search** — find skill files by keyword
+- **Compare** — directly compare two files for similarity
+- **Export** — save full audit report as JSON or Markdown
+- **Live watching** — auto-audit on file change
+- **Config file** — `.skillforgerc` for default path and threshold
+- **VS Code extension** — audit output in dedicated Output Channel
+- **Chrome extension** — save prompts as `.md` and analyze inline
 
 ---
 
@@ -28,8 +33,9 @@ SkillForge/
 ├── cli/
 │   ├── core/
 │   │   ├── scanner.py       # Recursive .md file scanner
-│   │   ├── analyzer.py      # Quality checks
-│   │   └── similarity.py    # TF-IDF duplicate detection
+│   │   ├── analyzer.py      # Quality checks + scoring
+│   │   ├── similarity.py    # TF-IDF duplicate detection
+│   │   └── config.py        # .skillforgerc loader
 │   └── commands/
 │       ├── audit.py         # audit command
 │       ├── duplicates.py    # duplicates command
@@ -37,7 +43,13 @@ SkillForge/
 │       ├── stats.py         # stats command
 │       ├── watch.py         # watch command
 │       ├── fix.py           # fix command
-│       └── list_cmd.py      # list command
+│       ├── list_cmd.py      # list command
+│       ├── search.py        # search command
+│       ├── export.py        # export command
+│       ├── score.py         # score command
+│       ├── compare.py       # compare command
+│       ├── init_cmd.py      # init command
+│       └── lint.py          # lint command
 ├── vscode-extension/        # VS Code extension
 ├── chrome-extension/        # Chrome extension
 ├── skills/                  # Your skill files go here
@@ -61,35 +73,14 @@ pip install -r requirements.txt
 
 ---
 
-## Usage
+## Quick Start
 
 ```bash
-# Audit all skills — duplicates + quality issues
+# Scaffold a skills directory + example file + .skillforgerc
+python -m cli.main init ./skills
+
+# Run a full audit
 python -m cli.main audit ./skills
-
-# List duplicate pairs
-python -m cli.main duplicates ./skills
-
-# Analyze a single file
-python -m cli.main analyze ./skills/myprompt.md
-
-# Stats — file count, avg length, word count
-python -m cli.main stats ./skills
-
-# List all skill files
-python -m cli.main list ./skills
-
-# Show duplicates for manual cleanup
-python -m cli.main fix ./skills
-
-# Watch directory and re-audit on change
-python -m cli.main watch ./skills
-```
-
-Or use the shorthand entry point:
-
-```bash
-python skillforge.py audit ./skills
 ```
 
 ---
@@ -98,13 +89,46 @@ python skillforge.py audit ./skills
 
 | Command | Description |
 |---|---|
-| `audit [path]` | Scan for duplicates and quality issues. `--json-out` for JSON output. |
-| `duplicates [path]` | List all duplicate skill pairs with similarity score |
-| `analyze [file]` | Analyze a single `.md` file for quality issues |
-| `stats [path]` | Show total files, duplicates, avg length, word count |
-| `list [path]` | List all skill files with their paths |
+| `init [path]` | Scaffold skills directory, example file, and `.skillforgerc` |
+| `audit [path]` | Duplicates + quality issues. Flags: `--threshold`, `--verbose`, `--quiet`, `--json-out` |
+| `lint [path]` | Bulk quality check — all files in a table with scores |
+| `duplicates [path]` | List duplicate pairs. Flag: `--threshold` |
+| `analyze [file]` | Analyze a single `.md` file |
+| `score [file]` | Show 0–100 quality score for a file |
+| `compare [file_a] [file_b]` | Compare two files — similarity score + common words |
+| `search [path] [keyword]` | Find skill files containing a keyword |
+| `export [path]` | Save audit report. Flag: `--format json\|md` |
+| `stats [path]` | Total files, duplicates, avg length, word count |
+| `list [path]` | List all skill files with paths |
 | `fix [path]` | Show duplicates and guide manual cleanup |
-| `watch [path]` | Watch directory and auto-audit on any `.md` change |
+| `watch [path]` | Watch directory and auto-audit on `.md` change |
+
+### Examples
+
+```bash
+python -m cli.main audit ./skills --verbose
+python -m cli.main audit ./skills --threshold 0.7
+python -m cli.main duplicates ./skills --threshold 0.6
+python -m cli.main score ./skills/myprompt.md
+python -m cli.main compare ./skills/a.md ./skills/b.md
+python -m cli.main search ./skills summarize
+python -m cli.main export ./skills --format md
+python -m cli.main lint ./skills
+```
+
+---
+
+## Config File
+
+Create `.skillforgerc` in your project root (or run `init`):
+
+```json
+{
+  "path": "./skills",
+  "threshold": 0.8,
+  "ignore": []
+}
+```
 
 ---
 
@@ -112,11 +136,11 @@ python skillforge.py audit ./skills
 
 Located in `vscode-extension/`.
 
-**Commands available via Command Palette (`Cmd+Shift+P`):**
-- `SkillForge: Audit` — runs audit on `./skills`
-- `SkillForge: Duplicates` — runs duplicates check on `./skills`
+**Commands (Command Palette `Cmd+Shift+P`):**
+- `SkillForge: Audit` — full audit with per-file scores in Output Channel
+- `SkillForge: Duplicates` — duplicate check in Output Channel
 
-To install locally: open VS Code → Extensions → `...` → Install from VSIX (after packaging).
+To install locally: VS Code → Extensions → `...` → Install from VSIX.
 
 ---
 
@@ -124,11 +148,10 @@ To install locally: open VS Code → Extensions → `...` → Install from VSIX 
 
 Located in `chrome-extension/`.
 
-**Buttons:**
-- **Save Prompt** — pastes your prompt and downloads it as `prompt-YYYY-MM-DD.md`
-- **Analyze Prompt** — checks for quality issues inline (too short, vague summarization, etc.)
+- **Save Prompt** — downloads prompt as `prompt-YYYY-MM-DD.md`
+- **Analyze Prompt** — inline quality check (too short, vague, etc.)
 
-To install: Chrome → `chrome://extensions` → Enable Developer Mode → Load Unpacked → select `chrome-extension/`.
+To install: Chrome → `chrome://extensions` → Developer Mode → Load Unpacked → `chrome-extension/`.
 
 ---
 

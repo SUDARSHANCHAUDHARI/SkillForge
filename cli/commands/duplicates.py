@@ -7,20 +7,20 @@ from cli.core.similarity import find_duplicates
 console = Console()
 
 
-def duplicates_cmd(path: str):
+def duplicates_cmd(path: str, threshold: float = 0.8):
     try:
         skills = scan_skills(path)
     except (FileNotFoundError, NotADirectoryError) as e:
         console.print(f"[red]Error:[/red] {e}")
         return
 
-    dups = find_duplicates(skills)
+    dups = find_duplicates(skills, threshold=threshold)
 
     if not dups:
         console.print("[green]No duplicates found.[/green]")
         return
 
-    table = Table(title="Duplicate Skills")
+    table = Table(title=f"Duplicate Skills (threshold: {threshold})")
     table.add_column("File A", style="cyan")
     table.add_column("File B", style="cyan")
     table.add_column("Score", style="yellow")
