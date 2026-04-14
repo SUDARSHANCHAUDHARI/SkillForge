@@ -176,6 +176,19 @@ scikit-learn
 
 ---
 
+## Documentation
+
+| Doc | Description |
+|---|---|
+| [Getting Started](docs/getting-started.md) | Install, setup, and first run |
+| [Command Reference](docs/commands.md) | All 15 commands with every flag |
+| [Config File](docs/config.md) | `.skillforgerc` reference |
+| [Extensions](docs/extensions.md) | VS Code + Chrome setup guide |
+| [Changelog](CHANGELOG.md) | Version history |
+| [Contributing](CONTRIBUTING.md) | How to add commands or fix bugs |
+
+---
+
 ## Author
 
 **SudarshanTechLabs** — [github.com/SUDARSHANCHAUDHARI](https://github.com/SUDARSHANCHAUDHARI)
