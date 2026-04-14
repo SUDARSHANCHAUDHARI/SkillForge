@@ -19,6 +19,9 @@ SkillForge scans directories of `.md` skill/prompt files, detects duplicates usi
 - **Search** — find skill files by keyword
 - **Compare** — directly compare two files for similarity
 - **Export** — save full audit report as JSON or Markdown
+- **Usage tracking** — parse Claude conversation history to show which skills are active vs never used
+- **Auto-fix** — fix whitespace and missing titles with dry-run preview
+- **Cleanup** — find and remove empty or broken skill files safely
 - **Live watching** — auto-audit on file change
 - **Config file** — `.skillforgerc` for default path and threshold
 - **VS Code extension** — audit output in dedicated Output Channel
@@ -49,7 +52,9 @@ SkillForge/
 │       ├── score.py         # score command
 │       ├── compare.py       # compare command
 │       ├── init_cmd.py      # init command
-│       └── lint.py          # lint command
+│       ├── lint.py          # lint command
+│       ├── usage.py         # usage command
+│       └── cleanup.py       # cleanup command
 ├── vscode-extension/        # VS Code extension
 ├── chrome-extension/        # Chrome extension
 ├── skills/                  # Your skill files go here
@@ -100,7 +105,9 @@ python -m cli.main audit ./skills
 | `export [path]` | Save audit report. Flag: `--format json\|md` |
 | `stats [path]` | Total files, duplicates, avg length, word count |
 | `list [path]` | List all skill files with paths |
-| `fix [path]` | Show duplicates and guide manual cleanup |
+| `fix [path]` | Auto-fix whitespace + missing titles. `--apply` to write changes. |
+| `cleanup [path]` | Find empty/broken files. `--apply` to delete. |
+| `usage [path]` | Show which skills are used vs never invoked (parses Claude history) |
 | `watch [path]` | Watch directory and auto-audit on `.md` change |
 
 ### Examples
@@ -114,6 +121,9 @@ python -m cli.main compare ./skills/a.md ./skills/b.md
 python -m cli.main search ./skills summarize
 python -m cli.main export ./skills --format md
 python -m cli.main lint ./skills
+python -m cli.main usage ./skills
+python -m cli.main fix ./skills --apply
+python -m cli.main cleanup ./skills --apply
 ```
 
 ---

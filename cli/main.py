@@ -2,6 +2,7 @@
 import typer
 from cli.commands import audit, duplicates, analyze, stats, watch, fix
 from cli.commands import list_cmd, search, export, score, compare, init_cmd, lint
+from cli.commands import usage, cleanup
 
 app = typer.Typer(help="SkillForge — skill file audit and management CLI.")
 
@@ -18,6 +19,8 @@ app.command("score")(score.score_cmd)
 app.command("compare")(compare.compare_cmd)
 app.command("init")(init_cmd.init_cmd)
 app.command("lint")(lint.lint_cmd)
+app.command("usage")(usage.usage_cmd)
+app.command("cleanup")(cleanup.cleanup_cmd)
 
 if __name__ == "__main__":
     app()
