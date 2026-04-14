@@ -8,9 +8,13 @@
 .LSOverride
 
 # Editor
+.vscode/
 .idea/
 *.swp
 *.swo
+
+# Logs
+*.log
 
 # Python
 __pycache__/
