@@ -31,3 +31,4 @@ credentials.*
 # Node/Web
 node_modules/
 dist/
+PLAN.md
