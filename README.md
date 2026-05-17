@@ -1,198 +1,198 @@
-# SkillForge
+# SkillForge 🔨📚
 
-> Audit, analyze, and manage your AI prompt skill files from the CLI.
+**Generate a personalized skill development learning path — milestones, daily plan, curated resources, checkpoints, and career applications, all from a single skill input.**
 
-![Python](https://img.shields.io/badge/Python-3.11+-blue)
-![License](https://img.shields.io/badge/License-MIT-green)
-![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey)
-
-SkillForge scans directories of `.md` skill/prompt files, detects duplicates using cosine similarity, flags quality issues, scores files 0–100, and gives you real-time watching — all from a single CLI. Comes with a VS Code extension and a Chrome extension.
+Enter a skill, your current level, target level, available time per day, and learning style, and get a complete learning roadmap: estimated total time, phased milestones with topics and projects, a day-by-day plan, key resources (books/courses/videos/practice), common mistakes, checkpoints to validate progress, and career applications.
 
 ---
 
-## Features
+## 🌟 Features
 
-- **Duplicate detection** — TF-IDF cosine similarity across all skill files
-- **Quality analysis** — flags vague, too-short, or poorly structured prompts
-- **Scoring** — 0–100 quality score per file
-- **Lint** — bulk quality check across all files in a table
-- **Search** — find skill files by keyword
-- **Compare** — directly compare two files for similarity
-- **Export** — save full audit report as JSON or Markdown
-- **Usage tracking** — parse Claude conversation history to show which skills are active vs never used
-- **Auto-fix** — fix whitespace and missing titles with dry-run preview
-- **Cleanup** — find and remove empty or broken skill files safely
-- **Live watching** — auto-audit on file change
-- **Config file** — `.skillforgerc` for default path and threshold
-- **VS Code extension** — audit output in dedicated Output Channel
-- **Chrome extension** — save prompts as `.md` and analyze inline
+### 🔨 Core Features
+- ✅ **Skill Input** — any skill (e.g. "TypeScript", "Public Speaking", "Machine Learning")
+- ✅ **Current Level Selector** — Complete Beginner, Some Experience, Intermediate, Advanced
+- ✅ **Target Level Selector** — Some Experience, Intermediate, Advanced, Expert
+- ✅ **Goal Selector** — Career Change, Side Project, Academic, Freelance, Curiosity
+- ✅ **Hours Per Day** — 0.5h, 1h, 2h, 3h, 4h+
+- ✅ **Estimated Total Time** — how long to reach the target level
+- ✅ **Milestones Tab** — phased milestones with title, duration, week, topics, projects, resources
+- ✅ **Daily Plan Tab** — day-by-day schedule with focus area, activities, time allocation
+- ✅ **Resources Tab** — curated books, courses, videos, and practice resources with why-this rationale
+- ✅ **Checkpoints Tab** — validation checkpoints with test criteria
+- ✅ **Common Mistakes** — pitfalls to avoid for this specific skill
+- ✅ **Career Applications** — how this skill applies in professional contexts
+- ✅ **Summary** — one-paragraph learning path overview
+
+### 🤖 AI Features
+- ✅ **Claude Sonnet 4.6** — designs evidence-based, personalized learning paths
+- ✅ **Level-calibrated** — Complete Beginner path differs structurally from Advanced → Expert
+- ✅ **Time-aware** — daily plan adapts to 0.5h vs 4h+ availability
+- ✅ **Goal-informed** — Career Change paths emphasize portfolio projects; Curiosity paths favor exploration
+- ✅ **Resource specificity** — recommends real, named resources with rationale
+
+### ⚙️ Technical Features
+- ✅ **Next.js 15 App Router** — server + client components
+- ✅ **TypeScript strict mode** — fully typed milestone and resource interfaces
+- ✅ **Tailwind CSS** — dark violet theme with tabbed result panel
 
 ---
 
-## Project Structure
+## 🏗️ Architecture
 
 ```
 SkillForge/
-├── cli/
-│   ├── core/
-│   │   ├── scanner.py       # Recursive .md file scanner
-│   │   ├── analyzer.py      # Quality checks + scoring
-│   │   ├── similarity.py    # TF-IDF duplicate detection
-│   │   └── config.py        # .skillforgerc loader
-│   └── commands/
-│       ├── audit.py         # audit command
-│       ├── duplicates.py    # duplicates command
-│       ├── analyze.py       # analyze command
-│       ├── stats.py         # stats command
-│       ├── watch.py         # watch command
-│       ├── fix.py           # fix command
-│       ├── list_cmd.py      # list command
-│       ├── search.py        # search command
-│       ├── export.py        # export command
-│       ├── score.py         # score command
-│       ├── compare.py       # compare command
-│       ├── init_cmd.py      # init command
-│       ├── lint.py          # lint command
-│       ├── usage.py         # usage command
-│       └── cleanup.py       # cleanup command
-├── vscode-extension/        # VS Code extension
-├── chrome-extension/        # Chrome extension
-├── skills/                  # Your skill files go here
-├── skillforge.py            # Entry point
-└── requirements.txt
+├── 📁 app/
+│   ├── 📄 page.tsx          # Main UI — skill input + tabbed learning path
+│   ├── 📄 layout.tsx        # Root layout with dark background
+│   ├── 📄 globals.css       # Global styles
+│   └── 📁 api/
+│       └── 📁 generate/
+│           └── 📄 route.ts  # POST /api/generate — Claude learning path designer
+├── 📁 public/               # Static assets
+├── 📄 .env.example          # Environment variable template
+├── 📄 package.json
+└── 📄 README.md
 ```
 
 ---
 
-## Install
+## 🖥️ UI Overview
 
-Requires Python 3.11+.
-
-```bash
-git clone https://github.com/SUDARSHANCHAUDHARI/SkillForge.git
-cd SkillForge
-python3.11 -m venv .venv
-source .venv/bin/activate      # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-```
-
----
-
-## Quick Start
-
-```bash
-# Scaffold a skills directory + example file + .skillforgerc
-python -m cli.main init ./skills
-
-# Run a full audit
-python -m cli.main audit ./skills
-```
-
----
-
-## Commands
-
-| Command | Description |
+| Section | Description |
 |---|---|
-| `init [path]` | Scaffold skills directory, example file, and `.skillforgerc` |
-| `audit [path]` | Duplicates + quality issues. Flags: `--threshold`, `--verbose`, `--quiet`, `--json-out` |
-| `lint [path]` | Bulk quality check — all files in a table with scores |
-| `duplicates [path]` | List duplicate pairs. Flag: `--threshold` |
-| `analyze [file]` | Analyze a single `.md` file |
-| `score [file]` | Show 0–100 quality score for a file |
-| `compare [file_a] [file_b]` | Compare two files — similarity score + common words |
-| `search [path] [keyword]` | Find skill files containing a keyword |
-| `export [path]` | Save audit report. Flag: `--format json\|md` |
-| `stats [path]` | Total files, duplicates, avg length, word count |
-| `list [path]` | List all skill files with paths |
-| `fix [path]` | Auto-fix whitespace + missing titles. `--apply` to write changes. |
-| `cleanup [path]` | Find empty/broken files. `--apply` to delete. |
-| `usage [path]` | Show which skills are used vs never invoked (parses Claude history) |
-| `watch [path]` | Watch directory and auto-audit on `.md` change |
+| **Skill Input** | Free-text — any skill to learn |
+| **Current Level** | Chips — Complete Beginner through Advanced |
+| **Target Level** | Chips — Some Experience through Expert |
+| **Goal** | Chips — Career Change, Side Project, Academic, Freelance, Curiosity |
+| **Hours Per Day** | Chips — 0.5h to 4h+ |
+| **Generate Path** | Triggers Claude learning path generation |
+| **Estimated Time** | Total duration to reach target level |
+| **Summary** | One-paragraph overview |
+| **Milestones Tab** | Phased milestones with topics and projects |
+| **Daily Plan Tab** | Day-by-day schedule |
+| **Resources Tab** | Curated books, courses, videos, practice |
+| **Checkpoints Tab** | Validation criteria for each phase |
+| **Common Mistakes** | Pitfalls specific to this skill |
+| **Career Applications** | Professional use cases |
 
-### Examples
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+
+- pnpm
+- Anthropic API key ([console.anthropic.com](https://console.anthropic.com))
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/SUDARSHANCHAUDHARI/SkillForge.git
+   cd SkillForge
+   ```
+
+2. **Install dependencies**
+   ```bash
+   pnpm install
+   ```
+
+3. **Set up environment**
+   ```bash
+   cp .env.example .env.local
+   # Edit .env.local and add your ANTHROPIC_API_KEY
+   ```
+
+4. **Run dev server**
+   ```bash
+   pnpm dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000)
+
+---
+
+## 📜 Scripts
 
 ```bash
-python -m cli.main audit ./skills --verbose
-python -m cli.main audit ./skills --threshold 0.7
-python -m cli.main duplicates ./skills --threshold 0.6
-python -m cli.main score ./skills/myprompt.md
-python -m cli.main compare ./skills/a.md ./skills/b.md
-python -m cli.main search ./skills summarize
-python -m cli.main export ./skills --format md
-python -m cli.main lint ./skills
-python -m cli.main usage ./skills
-python -m cli.main fix ./skills --apply
-python -m cli.main cleanup ./skills --apply
+pnpm dev      # Start development server (Turbopack)
+pnpm build    # Production build
+pnpm start    # Start production server
+pnpm lint     # ESLint check
 ```
 
 ---
 
-## Config File
+## 🔑 Environment Variables
 
-Create `.skillforgerc` in your project root (or run `init`):
+| Variable | Description | Required |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | Your Anthropic API key | ✅ Yes |
 
-```json
-{
-  "path": "./skills",
-  "threshold": 0.8,
-  "ignore": []
-}
-```
+Get your key at [console.anthropic.com](https://console.anthropic.com). Add it to `.env.local` — this file is gitignored and never committed.
 
 ---
 
-## VS Code Extension
+## 📊 Current Status
 
-Located in `vscode-extension/`.
-
-**Commands (Command Palette `Cmd+Shift+P`):**
-- `SkillForge: Audit` — full audit with per-file scores in Output Channel
-- `SkillForge: Duplicates` — duplicate check in Output Channel
-
-To install locally: VS Code → Extensions → `...` → Install from VSIX.
-
----
-
-## Chrome Extension
-
-Located in `chrome-extension/`.
-
-- **Save Prompt** — downloads prompt as `prompt-YYYY-MM-DD.md`
-- **Analyze Prompt** — inline quality check (too short, vague, etc.)
-
-To install: Chrome → `chrome://extensions` → Developer Mode → Load Unpacked → `chrome-extension/`.
-
----
-
-## Requirements
-
-```
-typer
-rich
-watchdog
-scikit-learn
-```
-
----
-
-## Documentation
-
-| Doc | Description |
+| Property | Value |
 |---|---|
-| [Getting Started](docs/getting-started.md) | Install, setup, and first run |
-| [Command Reference](docs/commands.md) | All 15 commands with every flag |
-| [Config File](docs/config.md) | `.skillforgerc` reference |
-| [Extensions](docs/extensions.md) | VS Code + Chrome setup guide |
-| [Changelog](CHANGELOG.md) | Version history |
-| [Contributing](CONTRIBUTING.md) | How to add commands or fix bugs |
+| **Version** | 1.0.0 |
+| **Status** | ✅ MVP Complete |
+| **Model** | claude-sonnet-4-6 |
+| **Skill Levels** | 4 (Complete Beginner, Some Experience, Intermediate, Advanced) |
+| **Goals** | 5 (Career Change, Side Project, Academic, Freelance, Curiosity) |
+| **Time Options** | 5 (0.5h, 1h, 2h, 3h, 4h+) |
+| **Result Tabs** | 4 (Milestones, Daily Plan, Resources, Checkpoints) |
 
 ---
 
-## Author
+## 🛠️ Tech Stack
 
-**SudarshanTechLabs** — [github.com/SUDARSHANCHAUDHARI](https://github.com/SUDARSHANCHAUDHARI)
+| Component | Technology |
+|---|---|
+| **Framework** | Next.js 15 (App Router) |
+| **Language** | TypeScript (strict mode) |
+| **Styling** | Tailwind CSS |
+| **AI** | Claude API — claude-sonnet-4-6 |
+| **Package Manager** | pnpm |
 
-## License
+---
 
-MIT
+## 🔒 Security
+
+- `ANTHROPIC_API_KEY` lives in `.env.local` — gitignored, never committed
+- `.env.example` contains placeholder values only
+- API key sent directly to Anthropic — no intermediate server
+- Skill inputs not stored or logged server-side
+
+---
+
+## 📄 License
+
+MIT License — see [LICENSE](LICENSE) for details.
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feat/your-feature`)
+3. Commit your changes (`git commit -m 'feat: add your feature'`)
+4. Push to the branch (`git push origin feat/your-feature`)
+5. Open a Pull Request
+
+---
+
+## 📞 Support
+
+- 🐛 Issues: [GitHub Issues](https://github.com/SUDARSHANCHAUDHARI/SkillForge/issues)
+
+---
+
+<div align="center">
+
+**Made with ❤️ by [SUDARSHANCHAUDHARI](https://github.com/SUDARSHANCHAUDHARI)**
+
+[⭐ Star this repo](https://github.com/SUDARSHANCHAUDHARI/SkillForge) · [🐛 Report Issue](https://github.com/SUDARSHANCHAUDHARI/SkillForge/issues)
+
+</div>
