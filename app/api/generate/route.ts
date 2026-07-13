@@ -1,7 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { guard, safeError, extractText, safeJson } from "../../../lib/apiGuard";
 import { NextRequest, NextResponse } from "next/server";
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 export async function POST(req: NextRequest) {
+  const _guard = guard(req);
+  if (_guard) return _guard;
   const { skill, currentLevel, targetLevel, timeAvailable, learningStyle } = await req.json();
   if (!skill?.trim()) return NextResponse.json({ error: "Skill required" }, { status: 400 });
   const prompt = `You are an expert learning path designer. Create a personalized skill development plan.
@@ -10,6 +13,6 @@ Return JSON: { "skillName": "string", "estimatedTime": "string", "milestones": [
 Return ONLY valid JSON.`;
   try {
     const msg = await client.messages.create({ model: "claude-sonnet-4-6", max_tokens: 1800, messages: [{ role: "user", content: prompt }] });
-    return NextResponse.json(JSON.parse((msg.content[0] as { type: string; text: string }).text));
-  } catch (e) { return NextResponse.json({ error: String(e) }, { status: 500 }); }
+    return NextResponse.json(safeJson(extractText(msg)));
+  } catch (e) { return safeError(e); }
 }
