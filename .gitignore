@@ -9,3 +9,5 @@ out/
 .vercel
 pnpm-debug.log*
 tsconfig.tsbuildinfo
+
+repoguard-results/
