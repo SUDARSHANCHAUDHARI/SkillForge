@@ -1,11 +1,13 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { guard, safeError, extractText, safeJson } from "../../../lib/apiGuard";
+import { guard, readJson, safeError, extractText, safeJson } from "../../../lib/apiGuard";
 import { NextRequest, NextResponse } from "next/server";
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 export async function POST(req: NextRequest) {
   const _guard = guard(req);
   if (_guard) return _guard;
-  const { skill, currentLevel, targetLevel, timeAvailable, learningStyle } = await req.json();
+  const body = await readJson(req);
+  if (body instanceof NextResponse) return body;
+  const { skill, currentLevel, targetLevel, timeAvailable, learningStyle } = body;
   if (!skill?.trim()) return NextResponse.json({ error: "Skill required" }, { status: 400 });
   const prompt = `You are an expert learning path designer. Create a personalized skill development plan.
 Skill: ${skill} | Current level: ${currentLevel || "Beginner"} | Target level: ${targetLevel || "Intermediate"} | Time: ${timeAvailable || "1 hour/day"} | Style: ${learningStyle || "Hands-on"}
