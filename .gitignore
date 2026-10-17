@@ -9,3 +9,9 @@ out/
 .vercel
 pnpm-debug.log*
 tsconfig.tsbuildinfo
+
+repoguard-results/
+
+# local planning and AI task notes
+PLAN.md
+CLAUDE_TASKS.md
