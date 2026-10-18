@@ -7,17 +7,17 @@ const HOURS_PER_DAY = ["0.5h", "1h", "2h", "3h", "4h+"];
 const TABS = ["milestones", "daily_plan", "resources", "checkpoints"];
 const TAB_LABELS: Record<string, string> = { milestones: "Milestones", daily_plan: "Daily Plan", resources: "Resources", checkpoints: "Checkpoints" };
 
-interface Milestone { title: string; description: string; duration: string; week: string; }
-interface DaySlot { time: string; activity: string; duration: string; }
-interface Resource { title: string; type: string; description: string; }
-interface Checkpoint { checkpoint: string; test: string; }
+// Shape matches the JSON the prompt in app/api/generate/route.ts asks for.
+interface Milestone { title: string; duration: string; topics: string[]; projects: string[]; resources: string[]; }
+interface DaySlot { day: string; focus: string; activities: string[]; time: string; }
+interface Resource { title: string; type: string; url: string; why: string; }
 interface SkillResult {
   summary?: string;
-  totalDuration?: string;
+  estimatedTime?: string;
   milestones?: Milestone[];
-  daily_plan?: DaySlot[];
-  resources?: Resource[];
-  checkpoints?: Checkpoint[];
+  dailyPlan?: DaySlot[];
+  keyResources?: Resource[];
+  checkpoints?: string[];
 }
 
 export default function SkillForgePage() {
@@ -70,10 +70,10 @@ export default function SkillForgePage() {
         {error && <div className="p-4 bg-red-900/30 border border-red-700 rounded-lg text-red-400 text-sm mb-4">{error}</div>}
         {result && (
           <div>
-            {(result.summary || result.totalDuration) && (
+            {(result.summary || result.estimatedTime) && (
               <div className="bg-[#111118] border border-orange-900/30 rounded-xl p-4 mb-4">
                 <div className="flex items-center gap-4 text-sm">
-                  {result.totalDuration && <span className="text-orange-300 font-semibold">{result.totalDuration}</span>}
+                  {result.estimatedTime && <span className="text-orange-300 font-semibold">{result.estimatedTime}</span>}
                   {result.summary && <><span className="text-slate-600">·</span><span className="text-slate-400">{result.summary}</span></>}
                 </div>
               </div>
@@ -88,34 +88,31 @@ export default function SkillForgePage() {
                     <div className="w-10 h-10 rounded-full bg-orange-900/40 border border-orange-700 flex items-center justify-center text-orange-300 text-sm font-bold flex-shrink-0">{i + 1}</div>
                     <div>
                       <h4 className="text-slate-200 font-medium text-sm">{m.title}</h4>
-                      <p className="text-slate-500 text-xs mt-0.5">{m.duration} · {m.week}</p>
-                      <p className="text-slate-400 text-sm mt-1">{m.description}</p>
+                      <p className="text-slate-500 text-xs mt-0.5">{m.duration}</p>
+                      <p className="text-slate-400 text-sm mt-1">{m.topics?.join(", ")}</p>
                     </div>
                   </div>
                 ))}
-                {activeTab === "daily_plan" && result.daily_plan?.map((item, i) => (
+                {activeTab === "daily_plan" && result.dailyPlan?.map((item, i) => (
                   <div key={i} className="flex gap-4 items-center p-3 bg-[#0d0d14] rounded-lg mb-2">
-                    <span className="text-orange-400 text-xs font-mono w-12">{item.time}</span>
-                    <span className="text-slate-300 text-sm flex-1">{item.activity}</span>
-                    <span className="text-slate-600 text-xs">{item.duration}</span>
+                    <span className="text-orange-400 text-xs font-mono w-12">{item.day}</span>
+                    <span className="text-slate-300 text-sm flex-1">{item.focus}: {item.activities?.join(", ")}</span>
+                    <span className="text-slate-600 text-xs">{item.time}</span>
                   </div>
                 ))}
-                {activeTab === "resources" && result.resources?.map((r, i) => (
+                {activeTab === "resources" && result.keyResources?.map((r, i) => (
                   <div key={i} className="flex gap-3 items-start p-3 bg-[#0d0d14] rounded-lg mb-2">
                     <span className="px-2 py-0.5 bg-orange-900/30 text-orange-500 text-xs rounded mt-0.5">{r.type}</span>
                     <div>
                       <p className="text-slate-200 text-sm font-medium">{r.title}</p>
-                      <p className="text-slate-500 text-xs mt-0.5">{r.description}</p>
+                      <p className="text-slate-500 text-xs mt-0.5">{r.why}</p>
                     </div>
                   </div>
                 ))}
                 {activeTab === "checkpoints" && result.checkpoints?.map((c, i) => (
                   <div key={i} className="flex gap-3 items-start p-3 bg-[#0d0d14] rounded-lg mb-2">
                     <input type="checkbox" className="mt-1 accent-orange-500" readOnly />
-                    <div>
-                      <p className="text-slate-200 text-sm">{c.checkpoint}</p>
-                      <p className="text-slate-500 text-xs mt-0.5 italic">{c.test}</p>
-                    </div>
+                    <p className="text-slate-200 text-sm">{c}</p>
                   </div>
                 ))}
               </div>

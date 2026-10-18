@@ -193,7 +193,7 @@ python -m cli.main fix PATH [OPTIONS]
 
 | Option | Default | Description |
 |---|---|---|
-| `--apply` | off | Write fixes to disk (default is preview only) |
+| `--apply` | off | Write fixes to disk (default is preview only). The original of each changed file is saved next to it as `<name>.md.bak` |
 
 **What it fixes automatically:**
 - Strips leading/trailing whitespace
