@@ -7,10 +7,10 @@ export async function POST(req: NextRequest) {
   if (_guard) return _guard;
   const body = await readJson(req);
   if (body instanceof NextResponse) return body;
-  const { skill, currentLevel, targetLevel, timeAvailable, learningStyle } = body;
+  const { skill, level, targetLevel, goal, hoursPerDay } = body;
   if (!skill?.trim()) return NextResponse.json({ error: "Skill required" }, { status: 400 });
   const prompt = `You are an expert learning path designer. Create a personalized skill development plan.
-Skill: ${skill} | Current level: ${currentLevel || "Beginner"} | Target level: ${targetLevel || "Intermediate"} | Time: ${timeAvailable || "1 hour/day"} | Style: ${learningStyle || "Hands-on"}
+Skill: ${skill} | Current level: ${level || "Complete Beginner"} | Target level: ${targetLevel || "Intermediate"} | Goal: ${goal || "Curiosity"} | Time: ${hoursPerDay ? `${hoursPerDay}/day` : "1h/day"}
 Return JSON: { "skillName": "string", "estimatedTime": "string", "milestones": [{ "title": "string", "duration": "string", "topics": ["string"], "projects": ["string"], "resources": ["string"] }], "dailyPlan": [{ "day": "string", "focus": "string", "activities": ["string"], "time": "string" }], "keyResources": [{ "title": "string", "type": "Book|Course|Video|Practice", "url": "string", "why": "string" }], "commonMistakes": ["string"], "checkpoints": ["string"], "careerApplications": ["string"], "summary": "string" }
 Return ONLY valid JSON.`;
   try {

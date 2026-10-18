@@ -1,5 +1,6 @@
 
 import os
+import shutil
 from rich.console import Console
 from cli.core.scanner import scan_skills
 from cli.core.similarity import find_duplicates
@@ -74,7 +75,11 @@ def fix_cmd(path: str, apply: bool = False):
             content = s["content"]
             for _, new_content in fixes:
                 content = new_content
+            if content == s["content"]:
+                continue
             try:
+                # Byte-exact copy of the original; fails (and skips the write) if unreadable.
+                shutil.copyfile(s["path"], s["path"] + ".bak")
                 with open(s["path"], "w", encoding="utf-8") as f:
                     f.write(content)
                 console.print(f"[green]Fixed:[/green] {s['name']}")

@@ -1,5 +1,6 @@
 
 import os
+import subprocess
 import typer
 from rich.console import Console
 from cli.core.scanner import scan_skills
@@ -18,6 +19,23 @@ def _is_broken(content: str) -> str | None:
     return None
 
 
+def _git_tracked(path: str) -> set:
+    """Absolute paths of git-tracked files under path; empty if not a repo or git missing."""
+    try:
+        out = subprocess.run(["git", "-C", path, "ls-files", "-z"], capture_output=True, check=True).stdout
+    except (OSError, subprocess.CalledProcessError):
+        return set()
+    return {os.path.realpath(os.path.join(path, f)) for f in out.decode("utf-8", "replace").split("\0") if f}
+
+
+def _is_candidate(path: str, file_path: str, tracked: set) -> bool:
+    """Only untracked files outside hidden dirs (.git, .claude, ...) may be deleted."""
+    rel = os.path.relpath(file_path, path)
+    if any(part.startswith(".") for part in rel.split(os.sep)[:-1]):
+        return False
+    return os.path.realpath(file_path) not in tracked
+
+
 def cleanup_cmd(path: str, apply: bool = False):
     try:
         skills = scan_skills(path)
@@ -27,6 +45,12 @@ def cleanup_cmd(path: str, apply: bool = False):
 
     if not skills:
         console.print("[yellow]No skill files found.[/yellow]")
+        return
+
+    tracked = _git_tracked(path)
+    skills = [s for s in skills if _is_candidate(path, s["path"], tracked)]
+    if not skills:
+        console.print("[yellow]No untracked skill files to check (git-tracked and hidden-dir files are skipped).[/yellow]")
         return
 
     broken = [(s, _is_broken(s["content"])) for s in skills]
